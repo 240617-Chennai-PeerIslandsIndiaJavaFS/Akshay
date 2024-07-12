@@ -29,17 +29,18 @@ public class TasksDAO {
         }
     }
     public boolean updateTask(Tasks task) {
-        String query = "UPDATE tasks SET task_name = ?, task_description = ?, task_start_date = ?, task_end_date = ?, project_id = ?, assigned_to = ?, task_status = ? WHERE task_id = ?";
+        String query = "UPDATE tasks SET task_name = ?, task_description = ?, start_date = ?, end_date = ?, project_id = ?, assigned_to = ?, task_status = ? WHERE task_id = ?";
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, task.getTask_id());
-            preparedStatement.setString(2, task.getTask_name());
-            preparedStatement.setString(3, task.getTask_description());
-            preparedStatement.setDate(4, task.getStart_date());
-            preparedStatement.setDate(5, task.getEnd_date());
-            preparedStatement.setInt(6, task.getProject_id());
-            preparedStatement.setInt(7, task.getAssigned_to());
-            preparedStatement.setString(8, task.getTaskStatus().name());
+
+            preparedStatement.setString(1, task.getTask_name());
+            preparedStatement.setString(2, task.getTask_description());
+            preparedStatement.setDate(3, task.getStart_date());
+            preparedStatement.setDate(4, task.getEnd_date());
+            preparedStatement.setInt(5, task.getProject_id());
+            preparedStatement.setInt(6, task.getAssigned_to());
+            preparedStatement.setString(7, task.getTaskStatus().name());
+            preparedStatement.setInt(8, task.getTask_id());
 
 
             int rowsAffected = preparedStatement.executeUpdate();
@@ -134,8 +135,8 @@ public class TasksDAO {
         task.setTask_id(resultSet.getInt("Task_id"));
         task.setTask_name(resultSet.getString("Task_name"));
         task.setTask_description(resultSet.getString("Task_description"));
-        task.setStart_date(resultSet.getDate("Task_start_date"));
-        task.setEnd_date(resultSet.getDate("Task_end_date"));
+        task.setStart_date(resultSet.getDate("start_date"));
+        task.setEnd_date(resultSet.getDate("end_date"));
         task.setProject_id(resultSet.getInt("Project_id"));
         task.setAssigned_to(resultSet.getInt("Assigned_to"));
         task.setTaskStatus(Tasks.TaskStatus.valueOf(resultSet.getString("task_status")));

@@ -8,10 +8,12 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
 public class ControllerClass {
+    private MessagesServices messagesServices;
     private UserService userService;
     private ClientsService clientsService;
     private ProjectTeamsService projectTeamsService;
@@ -19,19 +21,22 @@ public class ControllerClass {
     private ProjectsService projectService;
     private MilestonesService milestoneService;
     private ActualEffortServices actualEffortService;
-    private TasksService taskService;
+    private TasksService taskService=new TasksService();
     private Scanner scanner;
     private UserModels.UserRole userRole;
 
-    public ControllerClass(UserService userService, ClientsService clientsService, ProjectTeamsService projectTeamsService, TeamMembersService projectTeamMembersService,ProjectsService projectService,MilestonesService milestoneService,ActualEffortServices actualEffortService,TasksService taskService , Scanner scanner) throws SQLException {
+    public ControllerClass(UserService userService, ClientsService clientsService, ProjectTeamsService projectTeamsService, TeamMembersService projectTeamMembersService, ProjectsService projectService, MilestonesService milestoneService, ActualEffortServices actualEffortService, TasksService taskService, MessagesServices messagesServices, Scanner scanner) throws SQLException {
         this.userService = userService;
         this.clientsService = clientsService;
         this.projectTeamsService = projectTeamsService;
-        this.projectTeamMembersService=projectTeamMembersService;
-        this.projectService=projectService;
-        this.milestoneService=milestoneService;
-        this.actualEffortService =actualEffortService;
+        this.projectTeamMembersService = projectTeamMembersService;
+        this.projectService = projectService;
+        this.milestoneService = milestoneService;
+        this.actualEffortService = actualEffortService;
+        this.taskService = taskService;
+        this.messagesServices = messagesServices;
         this.scanner = scanner;
+
         askForRole();
     }
 
@@ -209,10 +214,12 @@ public class ControllerClass {
         while (true) {
             System.out.println(" ");
             System.out.println("_____________________________________________________");
-            System.out.println("ASSOCIATE Menu:");
+            System.out.println("                 ASSOCIATE Menu:");
             System.out.println("_____________________________________________________");
-            System.out.println("1️⃣. Logout");
-            System.out.println("2️⃣.Message Manager");
+            System.out.println("1️⃣. Update the current Status of your task");
+            System.out.println("2️⃣. Check project details of assigned projects");
+            System.out.println("3️⃣. Logout");
+            System.out.println("4️⃣. Message your Manager");
             System.out.print("Choose your option: ");
 
             int choice = scanner.nextInt();
@@ -220,11 +227,40 @@ public class ControllerClass {
 
             switch (choice) {
                 case 1:
+                    updateTaskStatus(user);
+                    break;
+                case 2:
+                    viewAssignedProjectDetails(user);
+                    break;
+                case 3:
                     logout(user);
                     return;
+                case 4:
+                    messageManager(user);
+                    break;
                 default:
                     System.out.println("Invalid❌.Please Try again!");
             }
+        }
+    }
+    private void messageManager(UserModels.User user) {
+        System.out.print("Enter your manager's username: ");
+        String managerUsername = scanner.nextLine();
+        UserModels.User manager = userService.getUser(managerUsername);
+
+        if (manager == null || manager.getUser_role() != UserModels.UserRole.Manager) {
+            System.out.println("Manager not found or the user is not a manager.");
+            return;
+        }
+
+        System.out.print("Enter your message: ");
+        String content = scanner.nextLine();
+
+        try {
+            messagesServices.sendMessage(user.getUser_id(), manager.getUser_id(), content);
+            System.out.println("Message sent successfully.");
+        } catch (Exception e) {
+            System.out.println("Failed to send message: " + e.getMessage());
         }
     }
 
@@ -651,17 +687,17 @@ public class ControllerClass {
         }
     }
     private void updateTaskStatus(UserModels.User user) throws SQLException {
-        System.out.print("Enter task name: ");
+        System.out.println("Enter task name: ");
         String taskName = scanner.nextLine();
         Tasks task = taskService.getTaskByName(taskName);
 
         if (task == null) {
-            System.out.println("Task does not exist❌.");
+            System.out.println("Task not found.");
             return;
         }
 
         if (task.getAssigned_to() != user.getUser_id()) {
-            System.out.println("You can't be assigned to this task❌.");
+            System.out.println("You are not assigned to this task.");
             return;
         }
 
@@ -670,23 +706,33 @@ public class ControllerClass {
         for (int i = 0; i < Tasks.TaskStatus.values().length; i++) {
             System.out.println((i + 1) + ". " + Tasks.TaskStatus.values()[i]);
         }
-        System.out.print("Enter your choice: ");
-        int statusChoice = scanner.nextInt();
-        scanner.nextLine();
+        System.out.println("Enter your choice: ");
 
-        if (statusChoice < 1 || statusChoice > Tasks.TaskStatus.values().length) {
-            System.out.println("Invalid❌ Please Try again!");
-            return;
+        int statusChoice = -1;
+        while (true) {
+            try {
+                statusChoice = scanner.nextInt();
+                scanner.nextLine(); // Consume the newline character
+                if (statusChoice < 1 || statusChoice > Tasks.TaskStatus.values().length) {
+                    System.out.println("Invalid choice. Try again!");
+                } else {
+                    break;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine(); // Consume the invalid input
+            }
         }
 
         Tasks.TaskStatus newStatus = Tasks.TaskStatus.values()[statusChoice - 1];
         task.setTaskStatus(newStatus);
+
         if (newStatus == Tasks.TaskStatus.Completed) {
             task.setEnd_date(Date.valueOf(LocalDate.now()));
         }
 
         taskService.updateTask(task);
-        System.out.println("Task status has been updated ☑️");
+        System.out.println("Task status updated successfully.");
     }
     private void manageProjects() throws SQLException {
         while (true) {
@@ -906,10 +952,11 @@ public class ControllerClass {
             return;
         }
 
+        System.out.println("Project ID:"+project.getProject_id());
         int projectId = project.getProject_id();
         System.out.println("Project id " + projectId);
 
-        System.out.print("Associate's' Team name: ");
+        System.out.print("Associate's name: ");
         String teamMemberName = scanner.nextLine();
         UserModels.User teamMember = userService.getUser(teamMemberName);
 

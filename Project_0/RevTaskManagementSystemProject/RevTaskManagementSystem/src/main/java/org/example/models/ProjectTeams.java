@@ -11,6 +11,9 @@ public class ProjectTeams {
         this.teamName = teamName;
     }
 
+    public ProjectTeams(int i, String team1) {
+    }
+
     public int getTeamId() {
         return teamId;
     }

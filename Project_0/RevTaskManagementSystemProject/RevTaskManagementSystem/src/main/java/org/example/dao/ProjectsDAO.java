@@ -14,7 +14,7 @@ public class ProjectsDAO {
     }
 
     public void addProject(Projects project) throws SQLException {
-        String sql = "INSERT INTO Projects (Project_id, Project_name, Client_id, Team_id, Start_date,Date_of_finish, Project_desc,Status_of_project) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Projects (Project_id, Project_name, Client_id, Team_id, Start_date,Date_of_finish, Project_desc,Status_of_project) VALUES (?, ?, ?, ?,?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1,project.getProject_id());
             statement.setString(2, project.getProject_name());
@@ -38,14 +38,15 @@ public class ProjectsDAO {
     public void updateProject(Projects project) throws SQLException {
         String sql = "UPDATE Projects SET Project_name = ?, Client_id = ?, Team_id = ?, Start_date = ?, Date_of_finish = ?, Project_desc = ?, Status_of_project = ? WHERE Project_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, project.getProject_id());
-            statement.setString(2, project.getProject_name());
-            statement.setInt(3, project.getClient_id());
-            statement.setInt(4, project.getTeam_id());
-            statement.setDate(5, project.getStart_date());
-            statement.setDate(6, project.getDate_of_finish());
-            statement.setString(7, project.getProject_desc());
-            statement.setString(8, project.getStatus_of_project().toString());
+
+            statement.setString(1, project.getProject_name());
+            statement.setInt(2, project.getClient_id());
+            statement.setInt(3, project.getTeam_id());
+            statement.setDate(4, project.getStart_date());
+            statement.setDate(5, project.getDate_of_finish());
+            statement.setString(6, project.getProject_desc());
+            statement.setString(7, project.getStatus_of_project().toString());
+            statement.setInt(8, project.getProject_id());
 
 
             statement.executeUpdate();
@@ -102,6 +103,7 @@ public class ProjectsDAO {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 Projects project = new Projects();
+                project.setProject_id(rs.getInt("Project_id"));
                 project.setProject_name(rs.getString("Project_name"));
                 project.setClient_id(rs.getInt("Client_id"));
                 project.setTeam_id(rs.getInt("Team_id"));

@@ -12,6 +12,10 @@ public class TasksService {
         this.taskDAO = new TasksDAO();
     }
 
+    public TasksService(TasksDAO dao){
+        this.taskDAO=dao;
+    }
+
     public boolean addTask(Tasks task) throws SQLException {
         return taskDAO.addTask(task);
     }

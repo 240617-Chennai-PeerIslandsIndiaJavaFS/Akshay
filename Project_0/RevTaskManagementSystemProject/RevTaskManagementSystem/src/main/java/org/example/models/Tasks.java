@@ -13,8 +13,23 @@ public class Tasks {
     private int assigned_to;
     private TaskStatus taskStatus;
 
+    public Tasks() {
+
+    }
+
     public enum TaskStatus {
         Started, In_Progress, Completed, Paused,Terminated
+    }
+
+    public Tasks(int task_id, String task_name, String task_description, Date start_date, Date end_date, int project_id, int assigned_to, TaskStatus taskStatus) {
+        this.task_id = task_id;
+        this.task_name = task_name;
+        this.task_description = task_description;
+        this.start_date = start_date;
+        this.end_date = end_date;
+        this.project_id = project_id;
+        this.assigned_to = assigned_to;
+        this.taskStatus = taskStatus;
     }
 
     public int getTask_id() {

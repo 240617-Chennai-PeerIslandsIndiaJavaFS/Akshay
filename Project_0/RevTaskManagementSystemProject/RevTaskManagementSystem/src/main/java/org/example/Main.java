@@ -20,7 +20,10 @@ public class Main {
         MilestonesService milestoneService=new MilestonesService();
         ActualEffortServices effortCalculationService= new ActualEffortServices();
         TasksService taskService= new TasksService();
-        ControllerClass userController = new ControllerClass(userService, clientsService, projectTeamsService, projectTeamMembersService,projectService, milestoneService, effortCalculationService, taskService,scanner);
+        MessagesServices messagesServices = new MessagesServices();
+
+
+        ControllerClass userController = new ControllerClass(userService, clientsService, projectTeamsService, projectTeamMembersService, projectService, milestoneService, effortCalculationService, taskService, messagesServices, scanner);
 
         userController.run();
     }

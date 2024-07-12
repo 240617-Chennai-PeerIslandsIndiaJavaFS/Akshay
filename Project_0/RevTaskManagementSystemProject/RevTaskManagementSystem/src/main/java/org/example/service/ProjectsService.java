@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.dao.ProjectsDAO;
+import org.example.dao.TasksDAO;
 import org.example.models.Projects;
 
 import java.sql.SQLException;
@@ -13,6 +14,9 @@ public class ProjectsService {private ProjectsDAO projectDAO;
 
     public ProjectsService() {
         this.projectDAO = new ProjectsDAO(connection);
+    }
+    public ProjectsService(ProjectsDAO dao){
+        this.projectDAO=dao;
     }
 
     public void addProject(Projects project) throws SQLException {

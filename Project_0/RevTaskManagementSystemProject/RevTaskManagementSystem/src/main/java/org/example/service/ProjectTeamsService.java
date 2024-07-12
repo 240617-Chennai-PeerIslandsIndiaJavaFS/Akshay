@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.dao.ProjectTeamsDAO;
+import org.example.dao.TasksDAO;
 import org.example.models.TeamMembers;
 import org.example.models.ProjectTeams;
 import org.example.models.UserModels;
@@ -10,6 +11,9 @@ import java.util.List;
 public class ProjectTeamsService {
     private ProjectTeamsDAO projectTeamsDAO;
     private TeamMembersService projectTeamMembersService;
+    public ProjectTeamsService(ProjectTeamsDAO dao){
+        this.projectTeamsDAO=dao;
+    }
 
     public ProjectTeamsService() {
         this.projectTeamsDAO = new ProjectTeamsDAO();

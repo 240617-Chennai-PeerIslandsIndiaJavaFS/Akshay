@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.dao.MilestonesDAO;
+import org.example.dao.TasksDAO;
 import org.example.models.Milestones;
 
 import java.sql.SQLException;
@@ -10,6 +11,11 @@ import static org.example.dao.UserDAO.connection;
 
 public class MilestonesService {
     private final MilestonesDAO milestoneDAO;
+
+
+    public MilestonesService(MilestonesDAO dao){
+        this.milestoneDAO=dao;
+    }
 
     public MilestonesService() {
         this.milestoneDAO = new MilestonesDAO(connection);

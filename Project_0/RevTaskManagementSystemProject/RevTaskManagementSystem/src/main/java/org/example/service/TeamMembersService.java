@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TeamMembersService {
-    private ProjectTeamMembersDAO projectTeamMembersDAO;
+    public ProjectTeamMembersDAO projectTeamMembersDAO;
 
     public TeamMembersService() {
         this.projectTeamMembersDAO = new ProjectTeamMembersDAO();
